@@ -35,16 +35,19 @@ jobs:
       TF_VAR_environment: ${{ inputs.environment }}
       TF_VAR_name_prefix: mats
 
-      TF_VAR_backend_resource_group_name: rg-tfstate-32of9u
-      TF_VAR_backend_storage_account_name: sttfstate32of9u
-      TF_VAR_backend_container_name: tfstate
-
       TF_INPUT: false
       TF_IN_AUTOMATION: true
 
     steps:
       - name: Hent koden
         uses: actions/checkout@v5
+
+      - name: Last backend-konfigurasjon
+        shell: bash
+        run: |
+          echo "TF_VAR_backend_resource_group_name=$(sed -n 's/^resource_group_name[[:space:]]*=[[:space:]]*"\(.*\)"/\1/p' shared/backend.hcl)" >> "$GITHUB_ENV"
+          echo "TF_VAR_backend_storage_account_name=$(sed -n 's/^storage_account_name[[:space:]]*=[[:space:]]*"\(.*\)"/\1/p' shared/backend.hcl)" >> "$GITHUB_ENV"
+          echo "TF_VAR_backend_container_name=$(sed -n 's/^container_name[[:space:]]*=[[:space:]]*"\(.*\)"/\1/p' shared/backend.hcl)" >> "$GITHUB_ENV"  
 
       - name: Installer Terraform
         uses: hashicorp/setup-terraform@v3
